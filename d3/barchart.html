@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+/*
+.bar {
+  fill: steelblue;
+}*/
+
+.bar:hover {
+  fill: #d9d9d9;
+}
+
+.axis {
+  font: 14px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+p {
+  margin-left: 40px;
+  font-size: 30px;
+  font-family: helvetica;
+  color: black;
+}
+
+br {
+  margin-left: 10px;
+  font-size: 30px;
+  font-family: helvetica;
+  color: black;
+}
+
+</style>
+<body>
+<P><b>Predicting Yelp's Elite:</b> Feature Importance</p>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script>
+
+var margin = {top: 10, right: 20, bottom: 90, left: 60},
+    width = 950 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom;
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var color = d3.scale.ordinal()
+  .domain(["activity", "sentiment", "popularity", "structure"])
+  .range(["#9ecae1", "#a1d99b","#fdae6b", "#bcbddc"]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(10, "%");
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.tsv("data.tsv", type, function(error, data) {
+  if (error) throw error;
+
+  x.domain(data.map(function(d) { return d.letter; }));
+  y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-45)" );
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end");
+
+  svg.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.letter); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.frequency); })
+      .attr("fill", function(d) { return color(d.cat); })
+      .attr("height", function(d) { return height - y(d.frequency); });
+
+
+  var colors_legend = [ ["activity", "#9ecae1"],
+                   ["sentiment/content", "#a1d99b"],["popularity", "#fdae6b"],
+                 ["structure", "#bcbddc"]];
+
+ var legend = svg.selectAll(".legend")
+     .data(colors_legend)
+   .enter().append("g")
+     .attr("class", "legend")
+     .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+ legend.append("rect")
+     .attr("x", width - 18)
+     .attr("width", 18)
+     .attr("height", 18)
+     .style("fill", color);
+
+ legend.append("text")
+     .attr("x", width - 24)
+     .attr("y", 9)
+     .attr("dy", ".35em")
+     .style("text-anchor", "end")
+     .text(function(d) { return d[0]; })
+     .attr("font-family", "helvetica")
+      // .attr("text-anchor", 'middle')
+     .attr("font-size", "14px")
+     .attr("fill", "black");
+
+  // var legendRect = legend.selectAll('rect').data(colors_legend);
+  //
+  // legendRect.enter()
+  //     .append("rect")
+  //     .attr("x", w - 65)
+  //     .attr("width", 10)
+  //     .attr("height", 10);
+  //
+  // legendRect
+  //     .attr("y", function(d, i) {
+  //         return i * 20;
+  //     })
+  //     .style("fill", function(d) {
+  //         return d[1];
+  //     });
+  //
+  // var legendText = legend.selectAll('text').data(colors);
+  //
+  // legendText.enter()
+  //     .append("text")
+  //     .attr("x", w - 52);
+  //
+  // legendText
+  //     .attr("y", function(d, i) {
+  //         return i * 20 + 9;
+  //     })
+  //     .text(function(d) {
+  //         return d[0];
+  //     });
+});
+
+function type(d) {
+  d.frequency = +d.frequency;
+  return d;
+}
+
+</script>
