@@ -9,7 +9,7 @@ For more information, see [my blog post](http://dianalam.github.io/2016/02/28/ye
 * `d3/` contains scripts for feature importance bar chart and network graph viz
 * `presentation/` contains pdf presentation of findings & recommendations
 
-For the sake of not overloading github, the original data was not uploaded to this repo. Yelp data can be accessed at the link provided at the bottom. 
+For the sake of not overloading github, the original data was not uploaded to this repo. Yelp data can be accessed at the link provided at the bottom of this readme.
 
 ## installation
 ### clone this repo  
